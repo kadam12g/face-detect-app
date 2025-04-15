@@ -45,9 +45,10 @@ jobs:
 
     - name: Update Kubernetes manifest
       run: |
-        IMAGE_TAG=$(echo ${{ steps.meta.outputs.tags }} | tr ' ' '\n' | grep sha)
+        IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr ' ' '\n' | grep sha)
+        echo "Image tag to use: ${IMAGE_TAG}"
         sed -i "s|ghcr.io/.*/face-detect-app:.*|${IMAGE_TAG}|g" k8s/deployment.yaml
-        
+            
     - name: Commit and push updated deployment file
       uses: EndBug/add-and-commit@v7
       with:
