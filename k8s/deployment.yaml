@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: demo-app
-        image: ghcr.io/kadam12g/face-detect-app:8985bb4f1247c39b1980084e3f538fe40d7197a9
+        image: ghcr.io/kadam12g/face-detect-app:0c909d116bdb5db5fd42b198104090a9401c265b
         ports:
         - containerPort: 8080
         env:
