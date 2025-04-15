@@ -12,47 +12,47 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        # This ensures we get the full history for pushing changes back
+        fetch-depth: 0
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata for Docker
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ghcr.io/${{ github.repository }}/face-detect-app
-        tags: |
-          type=sha,format=short
-          latest
-
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
+    - name: Build and push
+      uses: docker/build-push-action@v4
       with:
         context: .
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
 
     - name: Update Kubernetes manifest
       run: |
-        IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr ' ' '\n' | grep sha)
-        echo "Image tag to use: ${IMAGE_TAG}"
-        sed -i "s|ghcr.io/.*/face-detect-app:.*|${IMAGE_TAG}|g" k8s/deployment.yaml
-            
-    - name: Commit and push updated deployment file
-      uses: EndBug/add-and-commit@v7
-      with:
-        message: 'Update image tag to ${{ github.sha }}'
-        add: 'k8s/deployment.yaml'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        IMAGE_TAG="ghcr.io/${{ github.repository }}:${{ github.sha }}"
+        echo "Using image tag: ${IMAGE_TAG}"
+        sed -i "s|image: .*|image: ${IMAGE_TAG}|g" k8s/deployment.yaml
+        
+    - name: Set up Git
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email 'github-actions@github.com'
+        
+    - name: Commit and push changes
+      run: |
+        git add k8s/deployment.yaml
+        git commit -m "Update image tag to ${{ github.sha }}"
+        git push
