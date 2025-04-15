@@ -1,0 +1,55 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/**'
+      - 'Dockerfile'
+      - '.github/workflows/build.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ghcr.io/${{ github.repository }}/face-detect-app
+        tags: |
+          type=sha,format=short
+          latest
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Update Kubernetes manifest
+      run: |
+        IMAGE_TAG=$(echo ${{ steps.meta.outputs.tags }} | tr ' ' '\n' | grep sha)
+        sed -i "s|ghcr.io/.*/face-detect-app:.*|${IMAGE_TAG}|g" k8s/deployment.yaml
+        
+    - name: Commit and push updated deployment file
+      uses: EndBug/add-and-commit@v7
+      with:
+        message: 'Update image tag to ${{ github.sha }}'
+        add: 'k8s/deployment.yaml'
