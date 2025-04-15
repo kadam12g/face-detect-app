@@ -54,3 +54,5 @@ jobs:
       with:
         message: 'Update image tag to ${{ github.sha }}'
         add: 'k8s/deployment.yaml'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
