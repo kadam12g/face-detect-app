@@ -10,5 +10,8 @@
 venv
 .env
 
+# Python modules
+*.pyc
+
 # Secrets
 k8s/secret.yaml
