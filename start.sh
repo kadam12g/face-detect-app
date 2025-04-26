@@ -3,9 +3,11 @@ set -e
 
 echo "Starting face detection application..."
 
-# Check if database environment variables are set
-if [ -z "$DATABASE_URI" ]; then
-  echo "WARNING: DATABASE_URI is not set, using default SQLite database"
+# Check if PostgreSQL environment variables are set
+if [ -n "$POSTGRES_USER" ] && [ -n "$POSTGRES_PASSWORD" ]; then
+  echo "PostgreSQL environment variables found, will attempt to use PostgreSQL"
+else
+  echo "WARNING: PostgreSQL environment variables not set, using default SQLite database"
 fi
 
 # Start gunicorn with the application

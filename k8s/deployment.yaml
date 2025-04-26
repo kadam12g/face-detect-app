@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
       - name: volume-permissions
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:29a7820de2bc5936949755563c41ac38a6779738
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:28ca58f7099f66a36d97dd68820a481a80aba857
         command: ["sh", "-c", "chown -R 1000:1000 /app/uploads && chmod -R 775 /app/uploads"]
         volumeMounts:
         - name: uploads
@@ -26,18 +26,12 @@ spec:
         securityContext:
           runAsUser: 0  # Run as root for permission changes
       - name: wait-for-postgres
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:29a7820de2bc5936949755563c41ac38a6779738
+        image: busybox
         command: ['sh', '-c', 
-          'until pg_isready -h postgres -p 5432 -U $POSTGRES_USER; do echo waiting for postgres; sleep 2; done;']
-        env:
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secrets
-              key: postgres-user
+          'until nc -z -w5 postgres 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
       - name: face-detection
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:29a7820de2bc5936949755563c41ac38a6779738
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:28ca58f7099f66a36d97dd68820a481a80aba857
         ports:
         - containerPort: 5000
         env:
@@ -57,7 +51,7 @@ spec:
           value: "postfix-relay.mail.svc.cluster.local"
         - name: MAIL_RELAY_PORT
           value: "25"
-        # Add PostgreSQL environment variables
+        # PostgreSQL environment variables
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -68,10 +62,6 @@ spec:
             secretKeyRef:
               name: postgres-secrets
               key: postgres-password
-        - name: POSTGRES_DB
-          value: "facedetect"
-        - name: POSTGRES_HOST
-          value: "postgres"
         volumeMounts:
         - name: uploads
           mountPath: /app/app/static/uploads
