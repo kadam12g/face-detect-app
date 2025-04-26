@@ -10,8 +10,13 @@
 venv
 .env
 
+# Testing data
+app/static/uploads/*
+app/images.db
+
 # Python modules
 *.pyc
+app/__pycache__
 
 # Secrets
 k8s/secret.yaml
