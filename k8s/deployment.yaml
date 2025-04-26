@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
       - name: volume-permissions
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:2fccf56d455d6a7b6a18aa5d0a89b7ba9f8ce2cd
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:1e3b7c0b025979c99f72bd94ed61c38c1ff21d3e
         command: ["sh", "-c", "chown -R 1000:1000 /app/uploads && chmod -R 775 /app/uploads"]
         volumeMounts:
         - name: uploads
@@ -27,7 +27,7 @@ spec:
           runAsUser: 0  # Run as root for permission changes
       containers:
       - name: face-detection
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:2fccf56d455d6a7b6a18aa5d0a89b7ba9f8ce2cd
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:1e3b7c0b025979c99f72bd94ed61c38c1ff21d3e
         ports:
         - containerPort: 5000
         env:
