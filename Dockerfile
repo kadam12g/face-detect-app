@@ -9,9 +9,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Create uploads directory and set permissions
 RUN mkdir -p app/static/uploads && \
     chmod -R 777 app/static/uploads && \
-    chmod -R 777 /tmp
+    chmod 777 /app && \
+    touch /tmp/images.db && \
+    chmod 777 /tmp/images.db
 
 # Create uploads directory
 RUN mkdir -p app/static/uploads && chmod 777 app/static/uploads
@@ -19,6 +22,8 @@ RUN mkdir -p app/static/uploads && chmod 777 app/static/uploads
 # Set environment variables
 ENV FLASK_APP=app
 ENV FLASK_ENV=production
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Run as non-root user for better security
 RUN useradd -m appuser
