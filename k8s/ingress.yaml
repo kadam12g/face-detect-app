@@ -3,10 +3,17 @@ kind: Ingress
 metadata:
   name: face-detection-ingress
   annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "16m"
 spec:
+  tls:
+  - hosts:
+    - face-detection.kissadam.info
+    secretName: face-detection-tls
   rules:
-  - host: face-detection.kissadam.info  # Change this to your actual domain
+  - host: face-detection.kissadam.info
     http:
       paths:
       - path: /

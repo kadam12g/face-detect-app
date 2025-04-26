@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: face-detection-cert
+  namespace: face-detection
+spec:
+  secretName: face-detection-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - face-detection.kissadam.info
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days before expiry
