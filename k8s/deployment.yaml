@@ -5,7 +5,7 @@ metadata:
   labels:
     app: face-detection
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: face-detection
