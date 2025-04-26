@@ -4,4 +4,6 @@ metadata:
   name: face-detection-config
 data:
   FLASK_ENV: "production"
-  DATABASE_URI: "sqlite:///images.db"
+  FLASK_APP: "app"
+  MAIL_RELAY_HOST: "postfix-relay.mail.svc.cluster.local"
+  MAIL_RELAY_PORT: "25"

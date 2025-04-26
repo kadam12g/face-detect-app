@@ -32,7 +32,10 @@ spec:
         - containerPort: 5000
         env:
         - name: FLASK_APP
-          value: "app"
+          valueFrom:
+            configMapKeyRef:
+              name: face-detection-config
+              key: FLASK_APP
         - name: SKYBIOMETRY_API_KEY
           valueFrom:
             secretKeyRef:
@@ -44,9 +47,15 @@ spec:
               name: app-secrets
               key: skybiometry-api-secret
         - name: MAIL_RELAY_HOST
-          value: "postfix-relay.mail.svc.cluster.local"
+          valueFrom:
+            configMapKeyRef:
+              name: face-detection-config
+              key: MAIL_RELAY_HOST
         - name: MAIL_RELAY_PORT
-          value: "25"
+          valueFrom:
+            configMapKeyRef:
+              name: face-detection-config
+              key: MAIL_RELAY_PORT
         # PostgreSQL environment variables
         - name: POSTGRES_USER
           valueFrom:
@@ -94,7 +103,7 @@ spec:
             cpu: "200m"
             memory: "200Mi"
         securityContext:
-          runAsUser: 1000  # Match the UID of appuser in your container
+          runAsUser: 1000
           runAsNonRoot: true
           allowPrivilegeEscalation: false
       volumes:
