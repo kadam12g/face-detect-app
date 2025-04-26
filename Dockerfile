@@ -9,6 +9,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+RUN mkdir -p app/static/uploads && \
+    chmod -R 777 app/static/uploads && \
+    chmod -R 777 /tmp
+
 # Create uploads directory
 RUN mkdir -p app/static/uploads && chmod 777 app/static/uploads
 
