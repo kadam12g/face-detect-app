@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: face-detection
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:65e5c3ed2a3634cbd46133bcf5e14d1a97fe491c
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:f8c2bd790fb5746c49fc2216fd7ccd2795bdb48e
         ports:
         - containerPort: 5000
         env:
