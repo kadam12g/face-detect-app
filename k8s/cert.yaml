@@ -10,5 +10,5 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - face-detection.kissadam.info
-  duration: 2160h # 90 days
-  renewBefore: 360h # 15 days before expiry
+  duration: 2160h0m0s # 90 days
+  renewBefore: 360h0m0s # 15 days before expiry
