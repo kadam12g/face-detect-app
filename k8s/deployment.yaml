@@ -18,7 +18,7 @@ spec:
     spec:
       initContainers:
       - name: volume-permissions
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:78bcfc5923810bdff7cfeab1f139c645dfbb25c6
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:373874720ef994f2fbbf355c32b8a131f0ede549
         command: ["sh", "-c", "chown -R 1000:1000 /app/uploads && chmod -R 775 /app/uploads"]
         volumeMounts:
         - name: uploads
@@ -28,13 +28,13 @@ spec:
 <<<<<<< HEAD
 =======
       - name: wait-for-postgres
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:78bcfc5923810bdff7cfeab1f139c645dfbb25c6
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:373874720ef994f2fbbf355c32b8a131f0ede549
         command: ['sh', '-c', 
           'until (echo > /dev/tcp/postgres/5432) >/dev/null 2>&1; do echo "Waiting for postgres to be ready..."; sleep 2; done; echo "PostgreSQL is ready!"']
 >>>>>>> 000e6bc8dd48aceaa5698aec567f6169dfc24116
       containers:
       - name: face-detection
-        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:78bcfc5923810bdff7cfeab1f139c645dfbb25c6
+        image: ghcr.io/kadam12g/face-detect-app/face-detect-app:373874720ef994f2fbbf355c32b8a131f0ede549
         ports:
         - containerPort: 5000
         env:
