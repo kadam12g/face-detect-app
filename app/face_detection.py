@@ -2,7 +2,10 @@
 
 import requests
 import os
+import logging
 from urllib.parse import urlencode
+
+logger = logging.getLogger(__name__)
 
 class SkybiometryFaceDetection:
     """
@@ -49,16 +52,28 @@ class SkybiometryFaceDetection:
         
         # Extract face coordinates
         faces = []
+        
+        # Debug logging
+        logger.debug(f"API Response: {data}")
+        
         if 'photos' in data and data['photos']:
             photo = data['photos'][0]
             if 'tags' in photo:
                 for tag in photo['tags']:
+                    # Extract face coordinates from the tag
                     face = {
                         'x': tag['center']['x'],
                         'y': tag['center']['y'],
                         'width': tag['width'],
                         'height': tag['height']
                     }
+                    
+                    # Debug log the face we're adding
+                    logger.debug(f"Adding face: {face}")
+                    
                     faces.append(face)
+        
+        # Log the number of faces detected
+        logger.info(f"Detected {len(faces)} faces in the image")
         
         return faces
