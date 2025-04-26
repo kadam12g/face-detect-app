@@ -1,1 +1,14 @@
+# Documentation
+*.odt
+*.pdf
+
+# Editor files
+.~lock*
+*swp
+
+# Development environment
+venv
+.env
+
+# Secrets
 k8s/secret.yaml

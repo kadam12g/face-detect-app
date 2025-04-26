@@ -2,11 +2,23 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY app/requirements.txt .
+# Install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app/ .
+# Copy application code
+COPY . .
 
-EXPOSE 8080
+# Create uploads directory
+RUN mkdir -p app/static/uploads && chmod 777 app/static/uploads
 
-CMD ["python", "app.py"]
+# Set environment variables
+ENV FLASK_APP=app
+ENV FLASK_ENV=production
+
+# Run as non-root user for better security
+RUN useradd -m appuser
+USER appuser
+
+# Run gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

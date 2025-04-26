@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Image View</h1>
+    
+    <div class="image-details">
+        <h2>{{ image.description or "No description" }}</h2>
+        <p>Uploaded: {{ image.upload_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Faces detected: {{ image.faces_detected }}</p>
+    </div>
+    
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="{{ image.description }}">
+        
+        {% for face in faces %}
+            {% set x = face.x | float %}
+            {% set y = face.y | float %}
+            {% set width = face.width | float %}
+            {% set height = face.height | float %}
+            
+            <div class="face-box" style="
+                left: {{ x - (width/2) }}%;
+                top: {{ y - (height/2) }}%;
+                width: {{ width }}%;
+                height: {{ height }}%;
+            "></div>
+        {% endfor %}
+    </div>
+    
+    <div class="navigation">
+        <a href="{{ url_for('main.index') }}">Back to Home</a>
+    </div>
+{% endblock %}

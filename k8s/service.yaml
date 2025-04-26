@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo-app
-  namespace: demo
+  name: face-detection-service
 spec:
   selector:
-    app: demo-app
+    app: face-detection
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 5000
   type: ClusterIP

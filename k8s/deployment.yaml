@@ -1,26 +1,52 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-app
-  namespace: demo
+  name: face-detection-app
+  labels:
+    app: face-detection
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: demo-app
+      app: face-detection
   template:
     metadata:
       labels:
-        app: demo-app
+        app: face-detection
     spec:
       containers:
-      - name: demo-app
-        image: ghcr.io/kadam12g/face-detect-app:0c909d116bdb5db5fd42b198104090a9401c265b
+      - name: face-detection
+        image: ghcr.io/kadam12g/face-detect-app:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 5000
         env:
-        - name: SECRET_KEY
+        - name: FLASK_APP
+          value: "app"
+        - name: SKYBIOMETRY_API_KEY
           valueFrom:
             secretKeyRef:
-              name: demo-secret
-              key: secret-key
+              name: app-secrets
+              key: skybiometry-api-key
+        - name: SKYBIOMETRY_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: skybiometry-api-secret
+        - name: MAIL_RELAY_HOST
+          value: "postfix-relay.mail.svc.cluster.local"
+        - name: MAIL_RELAY_PORT
+          value: "25"
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/app/static/uploads
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+          requests:
+            cpu: "200m"
+            memory: "200Mi"
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc

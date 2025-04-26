@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Face Detection Application</h1>
+    
+    <div class="upload-section">
+        <h2>Upload a New Image</h2>
+        <form action="{{ url_for('main.upload') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="file">Select Image:</label>
+                <input type="file" id="file" name="file" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    
+    <div class="subscription-section">
+        <h2>Subscribe to Notifications</h2>
+        <p>Get notified when new images with faces are uploaded.</p>
+        <form action="{{ url_for('main.subscribe') }}" method="post">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit">Subscribe</button>
+        </form>
+    </div>
+    
+    {% if images %}
+        <h2>Recent Uploads</h2>
+        <div class="image-grid">
+            {% for image in images %}
+                <div class="image-item">
+                    <a href="{{ url_for('main.view_image', image_id=image.id) }}">
+                        <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="{{ image.description }}">
+                    </a>
+                    <div>
+                        <p>{{ image.description }}</p>
+                        <p>Faces detected: {{ image.faces_detected }}</p>
+                        <p>Uploaded: {{ image.upload_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No images uploaded yet.</p>
+    {% endif %}
+{% endblock %}

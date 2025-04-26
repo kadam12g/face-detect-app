@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>All Uploaded Images</h1>
+    
+    {% if images %}
+        <div class="image-grid">
+            {% for image in images %}
+                <div class="image-item">
+                    <a href="{{ url_for('main.view_image', image_id=image.id) }}">
+                        <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="{{ image.description }}">
+                    </a>
+                    <div>
+                        <p>{{ image.description }}</p>
+                        <p>Faces detected: {{ image.faces_detected }}</p>
+                        <p>Uploaded: {{ image.upload_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No images uploaded yet.</p>
+    {% endif %}
+{% endblock %}
