@@ -46,6 +46,13 @@ def upload():
         # Get description
         description = request.form.get('description', '')
         
+        # Create new image record
+        new_image = Image(
+            filename=filename,
+            description=description,
+            faces_detected=0
+        )
+        
         # Detect faces
         face_detector = SkybiometryFaceDetection(
             current_app.config['SKYBIOMETRY_API_KEY'],
@@ -53,20 +60,16 @@ def upload():
         )
         
         try:
+            # Detect faces and store the data
             faces = face_detector.detect_faces(filepath)
-            faces_count = len(faces)
+            new_image.set_faces(faces)
             
             # Save image info to database
-            new_image = Image(
-                filename=filename,
-                description=description,
-                faces_detected=faces_count
-            )
             db.session.add(new_image)
             db.session.commit()
             
             # Send notifications if faces were detected
-            if faces_count > 0:
+            if new_image.faces_detected > 0:
                 email_service = EmailService(
                     current_app.config['MAIL_RELAY_HOST'],
                     current_app.config['MAIL_RELAY_PORT']
@@ -77,14 +80,14 @@ def upload():
                 
                 image_data = {
                     'description': description,
-                    'faces_detected': faces_count,
+                    'faces_detected': new_image.faces_detected,
                     'url': image_url,
                     'unsubscribe_url': unsubscribe_url
                 }
                 
                 email_service.send_notification(image_data)
             
-            flash(f'Image uploaded successfully! Detected {faces_count} faces.')
+            flash(f'Image uploaded successfully! Detected {new_image.faces_detected} faces.')
             return redirect(url_for('main.view_image', image_id=new_image.id))
             
         except Exception as e:
@@ -99,20 +102,29 @@ def view_image(image_id):
     """Display an image with detected faces."""
     image = Image.query.get_or_404(image_id)
     
-    # Get face coordinates if any
-    face_detector = SkybiometryFaceDetection(
-        current_app.config['SKYBIOMETRY_API_KEY'],
-        current_app.config['SKYBIOMETRY_API_SECRET']
-    )
+    # Get face data from the database instead of making an API call
+    faces = image.get_faces()
     
-    filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], image.filename)
-    faces = []
-    
-    try:
+    # If no face data is stored (for images uploaded before this update),
+    # fall back to the API call as a one-time operation
+    if not faces and image.faces_detected > 0:
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], image.filename)
+        
         if os.path.exists(filepath):
-            faces = face_detector.detect_faces(filepath)
-    except Exception as e:
-        flash(f'Error retrieving face data: {str(e)}')
+            try:
+                face_detector = SkybiometryFaceDetection(
+                    current_app.config['SKYBIOMETRY_API_KEY'],
+                    current_app.config['SKYBIOMETRY_API_SECRET']
+                )
+                faces = face_detector.detect_faces(filepath)
+                
+                # Update the database with the face data for future use
+                image.set_faces(faces)
+                db.session.commit()
+                
+                flash('Face data updated and stored for future reference.')
+            except Exception as e:
+                flash(f'Error retrieving face data: {str(e)}')
     
     return render_template('view.html', image=image, faces=faces)
 

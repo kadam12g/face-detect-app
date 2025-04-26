@@ -2,6 +2,7 @@
 
 from app import db
 from datetime import datetime
+import json
 
 class Image(db.Model):
     __tablename__ = 'images'
@@ -11,6 +12,18 @@ class Image(db.Model):
     description = db.Column(db.Text)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
     faces_detected = db.Column(db.Integer, default=0)
+    faces_data = db.Column(db.Text)  # Store face detection JSON data
+    
+    def get_faces(self):
+        """Return the faces data as a Python object."""
+        if self.faces_data:
+            return json.loads(self.faces_data)
+        return []
+    
+    def set_faces(self, faces):
+        """Store faces data as JSON string."""
+        self.faces_data = json.dumps(faces)
+        self.faces_detected = len(faces)
     
     def __repr__(self):
         return f'<Image {self.filename}>'
@@ -25,4 +38,3 @@ class Subscriber(db.Model):
     
     def __repr__(self):
         return f'<Subscriber {self.email}>'
-
