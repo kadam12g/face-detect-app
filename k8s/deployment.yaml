@@ -16,6 +16,15 @@ spec:
       labels:
         app: face-detection
     spec:
+      initContainers:
+      - name: volume-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /app/uploads && chmod -R 775 /app/uploads"]
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        securityContext:
+          runAsUser: 0  # Run as root for permission changes
       containers:
       - name: face-detection
         image: ghcr.io/kadam12g/face-detect-app/face-detect-app:f8c2bd790fb5746c49fc2216fd7ccd2795bdb48e
@@ -48,6 +57,10 @@ spec:
           requests:
             cpu: "200m"
             memory: "200Mi"
+        securityContext:
+          runAsUser: 1000  # Match the UID of appuser in your container
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
       volumes:
       - name: uploads
         persistentVolumeClaim:
