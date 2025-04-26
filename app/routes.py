@@ -14,7 +14,7 @@ main = Blueprint('main', __name__)
 # Helper functions
 def allowed_file(filename):
     """Check if the file has an allowed extension."""
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @main.route('/')
@@ -105,27 +105,6 @@ def view_image(image_id):
     # Get face data from the database instead of making an API call
     faces = image.get_faces()
     
-    # If no face data is stored (for images uploaded before this update),
-    # fall back to the API call as a one-time operation
-    if not faces and image.faces_detected > 0:
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], image.filename)
-        
-        if os.path.exists(filepath):
-            try:
-                face_detector = SkybiometryFaceDetection(
-                    current_app.config['SKYBIOMETRY_API_KEY'],
-                    current_app.config['SKYBIOMETRY_API_SECRET']
-                )
-                faces = face_detector.detect_faces(filepath)
-                
-                # Update the database with the face data for future use
-                image.set_faces(faces)
-                db.session.commit()
-                
-                flash('Face data updated and stored for future reference.')
-            except Exception as e:
-                flash(f'Error retrieving face data: {str(e)}')
-    
     return render_template('view.html', image=image, faces=faces)
 
 @main.route('/subscribe', methods=['POST'])
@@ -182,3 +161,20 @@ def list_images():
     """List all uploaded images."""
     images = Image.query.order_by(Image.upload_date.desc()).all()
     return render_template('list.html', images=images)
+
+@main.route('/health')
+def health_check():
+    """Health check endpoint that verifies database connectivity."""
+    try:
+        # Execute a simple query to check database connectivity
+        db.session.execute('SELECT 1')
+        return {
+            'status': 'healthy',
+            'database': 'connected'
+        }, 200
+    except Exception as e:
+        return {
+            'status': 'unhealthy',
+            'database': 'disconnected',
+            'error': str(e)
+        }, 500

@@ -20,3 +20,4 @@ app/__pycache__
 
 # Secrets
 k8s/secret.yaml
+k8s/postgres-secret.yaml

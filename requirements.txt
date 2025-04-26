@@ -5,3 +5,4 @@ requests==2.26.0
 Werkzeug==2.0.1
 python-dotenv==0.19.0
 sqlalchemy==1.4.46
+psycopg2-binary==2.9.6
