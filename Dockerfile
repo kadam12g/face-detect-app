@@ -33,7 +33,14 @@ ENV PYTHONUNBUFFERED=1
 
 # Run as non-root user for better security
 RUN useradd -m appuser
+RUN chown -R appuser:appuser /app
+
+# Copy and set permissions for startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh && \
+    chown appuser:appuser /app/start.sh
+
 USER appuser
 
 # Run gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
+CMD ["/app/start.sh"]
