@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  lint-and-build:
     runs-on: ubuntu-latest
     permissions:
       contents: write

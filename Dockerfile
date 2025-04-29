@@ -43,4 +43,5 @@ RUN chmod +x /app/start.sh && \
 USER appuser
 
 # Run gunicorn
-CMD ["/app/start.sh"]
+#CMD ["/app/start.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]

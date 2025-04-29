@@ -1,6 +1,7 @@
 # Documentation
 *.odt
 *.pdf
+*.png
 
 # Editor files
 .~lock*
